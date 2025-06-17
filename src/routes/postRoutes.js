@@ -50,6 +50,6 @@ router.get('/feed', getFeed);
 router.post('/like/:postId', likePost);
 
 // Comment on a post
-router.post('/comment/:postId', authMiddleware, commentOnPost);
+router.post('/comment/:postId',  commentOnPost);
 
 module.exports = router;
