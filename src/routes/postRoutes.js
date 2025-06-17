@@ -47,7 +47,7 @@ router.post('/create',   createPost);
 router.get('/feed', getFeed);
 
 // Like/unlike a post
-router.post('/like/:postId', authMiddleware, likePost);
+router.post('/like/:postId', likePost);
 
 // Comment on a post
 router.post('/comment/:postId', authMiddleware, commentOnPost);
