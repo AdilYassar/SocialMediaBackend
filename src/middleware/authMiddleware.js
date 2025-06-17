@@ -1,27 +1,27 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/users');
 
-const authMiddleware = async (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   try {
-    // Extract token from the Authorization header
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided, authorization denied.' });
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authorization header missing or invalid' });
     }
 
-    // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const token = authHeader.split(' ')[1];
+    console.log('Extracted Token:', token);
 
-    // Attach user info to the request object
-    req.user = await User.findById(decoded.userId).select('-password');
-    if (!req.user) {
-      return res.status(401).json({ message: 'Invalid token, user not found.' });
-    }
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        console.error('JWT Verification Error:', err.message);
+        return res.status(401).json({ error: 'Invalid token', details: err.message });
+      }
 
-    next(); // Proceed to the next middleware or route handler
+      req.user = decoded;
+      next();
+    });
   } catch (error) {
-    console.error(error);
-    res.status(401).json({ message: 'Token is invalid or has expired.' });
+    console.error('Auth Middleware Error:', error.message);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 

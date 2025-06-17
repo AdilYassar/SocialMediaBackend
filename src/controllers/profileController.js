@@ -5,18 +5,16 @@ const getUserProfile = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Find the user
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select('name email profilePic');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Find the user's posts
     const posts = await Post.find({ author: userId }).sort({ createdAt: -1 });
 
     res.status(200).json({ user, posts });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Unable to fetch user profile', error: error.message });
   }
 };
 

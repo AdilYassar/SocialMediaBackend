@@ -1,8 +1,9 @@
 const express = require('express');
-const { registerUser, loginUser } = require('../controllers/authController');
 const router = express.Router();
+const { registerUser, loginUser, upload } = require('../controllers/authController');
 
-router.post('/register', registerUser);
+// Use multer middleware to handle profilePic
+router.post('/register', upload.single('profilePic'), registerUser);
 router.post('/login', loginUser);
 
 module.exports = router;
